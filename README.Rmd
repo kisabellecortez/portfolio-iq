@@ -1,0 +1,80 @@
+---
+title: "PortfolioIQ"
+output: html_document
+---
+
+# PortfolioIQ
+
+PortfolioIQ is a portfolio analytics application built with R Shiny and PostgreSQL. It tracks investment portfolios, retrieves historical market data, and calculates portfolio performance metrics.
+
+## 1. Start the PostgreSQL Database
+
+Start the existing Docker container:
+
+```bash
+docker start portfolioiq-db
+```
+
+Connect to the database:
+
+```bash
+docker exec -it portfolioiq-db psql -U portfolioiq_admin -d portfolioiq
+```
+
+Type `\q` to exit the PostgreSQL shell.
+
+## 2. Initialize the Database
+
+Run these commands from the project root directory:
+
+```bash
+docker exec -i portfolioiq-db psql -v ON_ERROR_STOP=1 -U portfolioiq_admin -d portfolioiq < sql/schema.sql
+docker exec -i portfolioiq-db psql -v ON_ERROR_STOP=1 -U portfolioiq_admin -d portfolioiq < sql/seed.sql
+```
+
+- `schema.sql` creates the database tables and constraints.
+- `seed.sql` inserts the initial portfolios, securities, transactions, and holdings.
+
+**Note:** The schema script should be designed to handle existing tables appropriately. The seed script should also be made idempotent before rerunning it, to avoid inserting duplicate transactions or holdings.
+
+## 3. Update Market Data
+
+Retrieve historical stock prices:
+
+```bash
+python scripts/update_historical_prices.py
+```
+
+Update current currency exchange rates:
+
+```bash
+python scripts/update_exchange_rates.py
+```
+
+These scripts retrieve market data using yfinance and store it in PostgreSQL.
+
+## 4. Run the Application
+
+Start the R Shiny application:
+
+```r
+shiny::runApp()
+```
+
+The application will be available at the localhost URL printed in the R console.
+
+## 5. Environment Configuration
+
+Create a `.env` file in the project root with your database configuration:
+
+```env
+DB_HOST=localhost
+DB_PORT=5434
+DB_NAME=portfolioiq
+DB_USER=portfolioiq_admin
+DB_PASSWORD=your_password
+APP_ENV=development
+MARKET_DATA_PROVIDER=yfinance
+```
+
+Do not commit `.env` to Git. Add it to `.gitignore` to protect your database credentials.
