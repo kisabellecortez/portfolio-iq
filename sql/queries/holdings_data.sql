@@ -1,3 +1,4 @@
+
 WITH transaction_summary AS (
   SELECT 
     security_id,
@@ -24,9 +25,9 @@ WITH transaction_summary AS (
       END
     ) AS total_shares_bought
     
-    FROM transactions
-    WHERE portfolio_id = $1
-    GROUP BY security_id
+  FROM transactions
+  WHERE portfolio_id = $1
+  GROUP BY security_id
 ),
 
 latest_prices AS (
@@ -44,7 +45,11 @@ SELECT
   lp.current_price,
   
   CASE 
-    WHEN ts.total_shares_bought > 0 THEN (ts.total_buy_cost / ts.total_shares_bought) * ts.shares
+    WHEN ts.total_shares_bought > 0
+      THEN (
+        (ts.total_buy_cost::DOUBLE PRECISION / ts.total_shares_bought)
+        * ts.shares
+      )::DOUBLE PRECISION
     ELSE 0
   END AS invested
 
