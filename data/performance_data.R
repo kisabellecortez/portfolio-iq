@@ -1,17 +1,18 @@
-library(dplyr)
-library(lubridate)
-
-set.seed(42)
-
-performance_data <- data.frame(
-  date = seq(
-    Sys.Date() - 365,
-    Sys.Date(),
-    by = "day"
+get_portfolio_performance <- function(portfolio_id) {
+  con <- connect_db()
+  
+  query <- paste(
+    readLines("sql/queries/portfolio_performance.sql"),
+    collapse = "\n"
   )
-) %>%
-  mutate(
-    portfolio_value = 100000 * cumprod(
-      1 + rnorm(n(), mean = 0.0003, sd = 0.008)
-    )
+  
+  result <- dbGetQuery(
+    con,
+    query,
+    params = list(portfolio_id)
   )
+  
+  dbDisconnect(con)
+  
+  return(result)
+}
