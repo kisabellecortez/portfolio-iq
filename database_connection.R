@@ -2,7 +2,7 @@ library(DBI)
 library(RPostgres)
 library(dotenv)
 
-dotenv::load_dot_env()
+dotenv::load_dot_env
 
 connect_db <- function() {
   con <- dbConnect(

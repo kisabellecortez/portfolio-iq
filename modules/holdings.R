@@ -1,4 +1,7 @@
+library(shiny)
+library(bslib)
 library(scales)
+library(dplyr)
 
 portfolio_holdings_ui <- function() {
   tagList(
@@ -8,16 +11,29 @@ portfolio_holdings_ui <- function() {
 
 portfolio_holdings_server <- function(input, output, session) {
   holdings <- reactive({
-    holdings_data
+    req(input$portfolio_id)
+    
+    con <- connect_db()
+    on.exit(disconnect_db(con))
+    
+    get_holdings_data(
+      con,
+      portfolio_id = as.integer(input$portfolio_id)
+    )
   })
   
   output$holdings_cards <- renderUI({
-    
     data <- holdings()
+    
+    if(nrow(data) == 0) {
+      return(
+        p("No holdings found for this portfolio.",
+          class = "text-muted")
+      )
+    }
     
     fluidRow(
       lapply(seq_len(nrow(data)), function(i) {
-        
         holding <- data[i, ]
         
         column(
@@ -57,27 +73,39 @@ portfolio_holdings_server <- function(input, output, session) {
                     class = "text-end",
                     
                     h4(
-                      dollar(holding$market_value),
+                      if (is.na(holding$market_value)) {
+                        "Price unavailable"
+                      } else {
+                        dollar(holding$market_value)
+                      },
                       class = "mb-1"
                     ),
                     
                     span(
-                      paste0(
-                        ifelse(
-                          holding$gain_loss >= 0,
-                          "+",
-                          "-"
-                        ),
-                        dollar(abs(holding$gain_loss)),
-                        " (",
-                        sprintf("%.2f", holding$return_pct),
-                        "%)"
-                      ),
+                      if (is.na(holding$gain_loss)) {
+                        "Return unavailable"
+                      } else {
+                        paste0(
+                          ifelse(
+                            holding$gain_loss >= 0,
+                            "+",
+                            "-"
+                          ),
+                          dollar(abs(holding$gain_loss)),
+                          " (",
+                          sprintf("%.2f", holding$return_pct),
+                          "%)"
+                        )
+                      },
                       
                       class = ifelse(
-                        holding$gain_loss >= 0,
-                        "text-success",
-                        "text-danger"
+                        is.na(holding$gain_loss),
+                        "text-muted",
+                        ifelse(
+                          holding$gain_loss >= 0,
+                          "text-success",
+                          "text-danger"
+                        )
                       ),
                       
                       style = "font-size: 13px;"

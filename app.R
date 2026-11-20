@@ -1,10 +1,12 @@
 library(shiny)
 library(bslib)
 
+source("database_connection.R")
+
 source("modules/portfolio_summary.R")
 source("modules/portfolio_performance.R")
 source("modules/portfolio_allocation.R")
-source("modules/portfolio_holdings.R")
+source("modules/holdings.R")
 
 source("data/portfolio_data.R")
 source("data/performance_data.R")
