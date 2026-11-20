@@ -1,3 +1,4 @@
+
 library(shiny)
 library(bslib)
 library(scales)
@@ -9,16 +10,17 @@ portfolio_holdings_ui <- function() {
   )
 }
 
-portfolio_holdings_server <- function(input, output, session) {
+portfolio_holdings_server <- function(input, output, session, portfolio_id) {
   holdings <- reactive({
-    req(input$portfolio_id)
+    
+    req(portfolio_id())
     
     con <- connect_db()
     on.exit(disconnect_db(con))
     
     get_holdings_data(
       con,
-      portfolio_id = as.integer(input$portfolio_id)
+      portfolio_id = as.integer(portfolio_id())
     )
   })
   
@@ -76,7 +78,7 @@ portfolio_holdings_server <- function(input, output, session) {
                       if (is.na(holding$market_value)) {
                         "Price unavailable"
                       } else {
-                        dollar(holding$market_value)
+                        dollar(holding$market_value, accuracy = 0.01)
                       },
                       class = "mb-1"
                     ),
@@ -91,7 +93,7 @@ portfolio_holdings_server <- function(input, output, session) {
                             "+",
                             "-"
                           ),
-                          dollar(abs(holding$gain_loss)),
+                          dollar(abs(holding$gain_loss), accuracy = 0.01),
                           " (",
                           sprintf("%.2f", holding$return_pct),
                           "%)"

@@ -16,10 +16,20 @@ portfolio_allocation_ui <- function() {
   )
 }
 
-portfolio_allocation_server <- function(input, output, session) {
+portfolio_allocation_server <- function(input, output, session, portfolio_id) {
+  sector_data <- reactive({
+    get_sector_allocation(portfolio_id())
+  })
+  
+  security_type_data <- reactive({
+    get_security_type_allocation(portfolio_id())
+  })
+  
   output$sector_pie <- renderPlotly({
+    data <- sector_data()
+    
     plot_ly(
-      data = sector_data,
+      data = data,
       labels = ~sector,
       values = ~allocation,
       type = "pie",
@@ -38,8 +48,10 @@ portfolio_allocation_server <- function(input, output, session) {
   })
   
   output$security_type_pie <- renderPlotly({
+    data <- security_type_data()
+    
     plot_ly(
-      data = security_type_data,
+      data = data,
       labels = ~security_type,
       values = ~allocation,
       type = "pie",

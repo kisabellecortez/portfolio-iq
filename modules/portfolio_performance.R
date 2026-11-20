@@ -26,10 +26,16 @@ portfolio_performance_ui <- function() {
   )
 }
 
-portfolio_performance_server <- function(input, output, session) {
+portfolio_performance_server <- function(input, output, session, portfolio_id) {
+  performance_data <- reactive({
+    get_portfolio_performance(portfolio_id())
+  })
+  
   filtered_performance <- reactive({
-    data <- performance_data
-    end_date <- max(data$date)
+    data <- performance_data()
+    req(nrow(data) > 0)
+    
+    end_date <- max(data$date, na.rm = TRUE)
     start_date <- switch(
       input$performance_period,
       "1D" = end_date - days(1),
@@ -39,7 +45,7 @@ portfolio_performance_server <- function(input, output, session) {
       "6M" = end_date - months(6),
       "YTD" = floor_date(end_date, "year"),
       "1Y" = end_date - years(1),
-      "ALL" = min(data$date)
+      "ALL" = min(data$date, na.rm = TRUE)
     )
     
     data %>%
