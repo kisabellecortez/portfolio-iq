@@ -1,4 +1,3 @@
-
 WITH dates AS (
     SELECT DISTINCT price_date AS date
     FROM historical_prices
