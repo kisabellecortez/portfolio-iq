@@ -2,12 +2,11 @@
 import os
 import yfinance as yf
 import psycopg2
-import pandas as pd
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Database connection
+
 def get_connection():
     return psycopg2.connect(
         host=os.getenv("DB_HOST"),
@@ -33,9 +32,8 @@ def update_historical_prices():
         securities = cursor.fetchall()
 
         for security_id, ticker in securities:
-            print(f"Downloading {ticker}...")
+            print(f"Downloading security {ticker}...")
 
-            # Download one year of daily prices
             data = yf.Ticker(ticker).history(
                 period="1y",
                 interval="1d",
@@ -51,7 +49,6 @@ def update_historical_prices():
 
             for date, price in data.iterrows():
 
-                # Skip incomplete records
                 required = ["Open", "High", "Low", "Close", "Volume"]
 
                 if price[required].isna().any():
@@ -70,7 +67,6 @@ def update_historical_prices():
                     int(price["Volume"])
                 ))
 
-            # Insert or update historical prices
             cursor.executemany("""
                 INSERT INTO historical_prices (
                     security_id,
@@ -107,5 +103,76 @@ def update_historical_prices():
         conn.close()
 
 
+def update_benchmark_historical_prices():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Retrieve all benchmarks
+        cursor.execute("""
+            SELECT benchmark_id, benchmark_name, ticker
+            FROM benchmarks
+            ORDER BY benchmark_name;
+        """)
+
+        benchmarks = cursor.fetchall()
+
+        for benchmark_id, benchmark_name, ticker in benchmarks:
+            print(f"Downloading benchmark {benchmark_name} ({ticker})...")
+
+            data = yf.Ticker(ticker).history(
+                period="1y",
+                interval="1d",
+                auto_adjust=False,
+                actions=False
+            )
+
+            if data.empty:
+                print(f"No data returned for benchmark {ticker}")
+                continue
+
+            rows = []
+
+            for date, price in data.iterrows():
+
+                if price["Close"] != price["Close"]:
+                    continue
+
+                rows.append((
+                    benchmark_id,
+                    date.date(),
+                    float(price["Close"])
+                ))
+
+            cursor.executemany("""
+                INSERT INTO benchmark_historical_prices (
+                    benchmark_id,
+                    price_date,
+                    close_price
+                )
+                VALUES (%s, %s, %s)
+
+                ON CONFLICT (benchmark_id, price_date)
+                DO UPDATE SET
+                    close_price = EXCLUDED.close_price;
+            """, rows)
+
+            conn.commit()
+
+            print(
+                f"Inserted/updated {len(rows)} records "
+                f"for benchmark {benchmark_name}"
+            )
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
 if __name__ == "__main__":
     update_historical_prices()
+    update_benchmark_historical_prices()

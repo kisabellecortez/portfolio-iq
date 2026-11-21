@@ -120,4 +120,60 @@ HAVING SUM(
     END
 ) <> 0;
 
+INSERT INTO benchmarks (
+    benchmark_name,
+    ticker,
+    description,
+    currency
+)
+VALUES
+(
+    'S&P/TSX Composite',
+    '^GSPTSE',
+    'Broad Canadian equity market index',
+    'CAD'
+),
+(
+    'S&P/TSX 60',
+    'TX60.TS',
+    'Tracks 60 large and liquid Canadian companies',
+    'CAD'
+),
+(
+    'S&P 500',
+    '^GSPC',
+    'Tracks 500 leading US companies',
+    'USD'
+),
+(
+    'NASDAQ Composite',
+    '^IXIC',
+    'Broad index of securities listed on Nasdaq',
+    'USD'
+),
+(
+    'Russell 2000',
+    '^RUT',
+    'Tracks small-cap US companies',
+    'USD'
+),
+(
+    'MSCI World',
+    'URTH',
+    'iShares MSCI World ETF proxy',
+    'USD'
+),
+(
+    'MSCI Emerging Markets',
+    'EEM',
+    'iShares MSCI Emerging Markets ETF proxy',
+    'USD'
+),
+(
+    'FTSE Canada Universe Bond',
+    'XBB.TO',
+    'iShares Core Canadian Universe Bond ETF proxy',
+    'CAD'
+);
+
 COMMIT;

@@ -117,6 +117,29 @@ CREATE TABLE portfolio_metrics (
         UNIQUE (portfolio_id, metric_date)
 );
 
+CREATE TABLE benchmarks (
+  benchmark_id SERIAL PRIMARY KEY,
+  benchmark_name VARCHAR(100) NOT NULL,
+  ticker VARCHAR(20) NOT NULL UNIQUE,
+  description TEXT,
+  currency VARCHAR(3) NOT NULL DEFAULT 'CAD',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE benchmark_historical_prices (
+  benchmark_price_id SERIAL PRIMARY KEY,
+  benchmark_id INTEGER NOT NULL,
+  price_date DATE NOT NULL,
+  close_price NUMERIC(18, 6) NOT NULL,
+  
+  CONSTRAINT fk_benchmark
+    FOREIGN KEY (benchmark_id)
+    REFERENCES benchmarks(benchmark_id),
+    
+  CONSTRAINT unique_benchmark_date
+    UNIQUE (benchmark_id, price_date)
+);
+
 CREATE INDEX idx_transactions_portfolio
     ON transactions(portfolio_id);
 
