@@ -3,39 +3,40 @@ library(bslib)
 
 source("database_connection.R")
 
-source("data/allocation_data.R")
-source("data/holdings_data.R")
+source("data/dropdowns_data.R")
 source("data/performance_data.R")
-source("data/portfolios.R")
-source("data/portfolio_summary.R")
+source("data/portfolio_overview_data.R")
+source("data/portfolio_performance_data.R")
 
-source("modules/portfolio_holdings.R")
-source("modules/portfolio_allocation.R")
-source("modules/portfolio_performance.R")
-source("modules/portfolio_summary.R")
+source("pages/overview.R")
+source("pages/performance.R")
 
 ui <- page_sidebar(
   title = "PortfolioIQ",
   
   sidebar = sidebar(
     selectInput(
-      "portfolio_id",
-      "Select Portfolio",
-      choices = character(0)
+      inputId = "portfolio_id",
+      label = "Select Portfolio",
+      choices = NULL
+    ),
+    
+    navset_pill_list(
+      id = "portfolio_pages",
+      
+      nav_panel(
+        title = "Portfolio Overview",
+        value = "overview"
+      ),
+      
+      nav_panel(
+        title = "Portfolio Performance",
+        value = "performance"
+      )
     )
   ),
   
-  h2("Investment Overview"),
-  portfolio_summary_ui(),
-  
-  h2("Portfolio Performance"),
-  portfolio_performance_ui(),
-  
-  h2("Asset Allocation"),
-  portfolio_allocation_ui(),
-  
-  h2("Holdings"),
-  portfolio_holdings_ui()
+  uiOutput("page_content")
 )
 
 server <- function(input, output, session) {
@@ -48,28 +49,45 @@ server <- function(input, output, session) {
       portfolios$portfolio_id,
       portfolios$portfolio_name
     ),
-    selected = portfolios$portfolio_id[1]
+    selected = if (nrow(portfolios) > 0) {
+      portfolios$portfolio_id[1]
+    } else {
+      character(0)
+    }
   )
   
   selected_portfolio_id <- reactive({
+    req(input$portfolio_id)
     as.integer(input$portfolio_id)
   })
   
-  portfolio_summary_server(
-    input, output, session, selected_portfolio_id
+  output$page_content <- renderUI({
+    req(input$portfolio_pages)
+    
+    if (input$portfolio_pages == "overview") {
+      
+      portfolio_overview_ui()
+      
+    } else if (input$portfolio_pages == "performance") {
+      
+      portfolio_performance_page_ui()
+    }
+  })
+  
+  portfolio_overview_server(
+    input,
+    output,
+    session,
+    selected_portfolio_id
   )
   
   portfolio_performance_server(
-    input, output, session, selected_portfolio_id
+    input,
+    output,
+    session,
+    selected_portfolio_id
   )
   
-  portfolio_allocation_server(
-    input, output, session, selected_portfolio_id
-  )
-  
-  portfolio_holdings_server(
-    input, output, session, selected_portfolio_id
-  )
 }
 
 shinyApp(ui, server)
