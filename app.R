@@ -28,6 +28,7 @@ ui <- page_sidebar(
     
     navset_pill_list(
       id = "portfolio_pages",
+      well = FALSE,
       
       nav_panel(
         title = "Portfolio Overview",
