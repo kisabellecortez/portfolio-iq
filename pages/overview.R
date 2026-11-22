@@ -21,7 +21,7 @@ portfolio_overview_ui <- function() {
       inline = TRUE
     ),
     
-    plotlyOutput("overview_performance_chart", height = "350px"),
+    plotlyOutput("overview_performance_chart", height = "550px"),
     
     portfolio_allocation_ui(),
     
@@ -36,7 +36,7 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
     req(portfolio_id())
     
     con <- connect_db()
-    on.exit(disconnect_db(con))
+    on.exit(DBI::dbDisconnect(con), add = TRUE)
     
     get_portfolio_summary(
       con,
@@ -139,6 +139,8 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
       )
     ) %>%
       layout(
+        autosize = TRUE,
+        height = 550,
         xaxis = list(
           title = "",
           showgrid = FALSE
@@ -148,7 +150,7 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
           tickprefix = "$",
           separatethousands = TRUE
         ),
-        margin = list(t = 20, b = 40, l = 60, r = 20),
+        margin = list(t = 40, b = 50, l = 60, r = 30),
         showlegend = FALSE
       )
   })
@@ -213,7 +215,7 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
     req(portfolio_id())
     
     con <- connect_db()
-    on.exit(disconnect_db(con))
+    on.exit(DBI::dbDisconnect(con), add = TRUE)
     
     get_holdings_data(
       con,

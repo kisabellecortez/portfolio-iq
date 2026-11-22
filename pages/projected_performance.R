@@ -61,7 +61,6 @@ portfolio_projected_performance_server <- function(input, output, session, portf
   })
   
   output$projection_chart <- renderPlotly({
-    
     chart_data <- projection_data()$chart_data
     
     plot_ly(chart_data, x = ~year) %>%

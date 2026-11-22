@@ -23,7 +23,7 @@ portfolio_performance_page_ui <- function() {
       inline = TRUE
     ),
     
-    plotlyOutput("performance_chart", height = "350px"),
+    plotlyOutput("performance_chart", height = "550px"),
     
     uiOutput("risk_analysis")
   )
@@ -231,6 +231,8 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
       ) %>%
       
       layout(
+        autosize = TRUE,
+        height = 550,
         xaxis = list(
           title = "",
           showgrid = FALSE
@@ -240,7 +242,7 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
           showgrid = TRUE,
           separatethousands = TRUE
         ),
-        margin = list(t = 20, b = 40, l = 60, r = 20),
+        margin = list(t = 40, b = 50, l = 60, r = 30),
         legend = list(
           orientation = "h",
           x = 0,
@@ -346,7 +348,7 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
           )
         ),
         
-        col_widths = c(6, 6, 6, 6)
+        col_widths = c(3, 3, 3, 3)
       )
     )
   })
