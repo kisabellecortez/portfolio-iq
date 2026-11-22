@@ -23,7 +23,7 @@ portfolio_overview_ui <- function() {
     
     plotlyOutput("overview_performance_chart", height = "550px"),
     
-    uioutput("sector_pie"),
+    uiOutput("sector_pie"),
     
     uiOutput("security_type_pie"),
     
