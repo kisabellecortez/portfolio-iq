@@ -134,12 +134,6 @@ VALUES
     'CAD'
 ),
 (
-    'S&P/TSX 60',
-    'TX60.TS',
-    'Tracks 60 large and liquid Canadian companies',
-    'CAD'
-),
-(
     'S&P 500',
     '^GSPC',
     'Tracks 500 leading US companies',
