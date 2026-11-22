@@ -1,3 +1,4 @@
+
 portfolio_overview_ui <- function() {
   tagList(
     h2("Investment Overview"),
@@ -23,15 +24,28 @@ portfolio_overview_ui <- function() {
     
     plotlyOutput("overview_performance_chart", height = "550px"),
     
-    uiOutput("sector_pie"),
+    h2("Portfolio Allocation"),
     
-    uiOutput("security_type_pie"),
+    layout_columns(
+      div(
+        h4("Sector Allocation"),
+        plotlyOutput("sector_pie", height = "350px")
+      ),
+      
+      div(
+        h4("Security Type Allocation"),
+        plotlyOutput("security_type_pie", height = "350px")
+      ),
+      
+      col_widths = c(6, 6)
+    ),
     
     h2("Holdings"),
     
     uiOutput("holdings_cards")
   )
 }
+
 
 portfolio_overview_server <- function(input, output, session, portfolio_id) {
   summary_data <- reactive({
@@ -45,6 +59,7 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
       portfolio_id = as.integer(portfolio_id())
     )
   })
+  
   
   output$portfolio_summary_boxes <- renderUI({
     data <- summary_data()
@@ -98,6 +113,7 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
     get_portfolio_performance(portfolio_id())
   })
   
+  
   filtered_performance <- reactive({
     data <- performance_data()
     
@@ -142,7 +158,6 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
     ) %>%
       layout(
         autosize = TRUE,
-        height = 550,
         xaxis = list(
           title = "",
           showgrid = FALSE
@@ -191,6 +206,7 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
     get_security_type_allocation(portfolio_id())
   })
   
+  
   output$security_type_pie <- renderPlotly({
     data <- security_type_data()
     
@@ -224,6 +240,7 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
       portfolio_id = as.integer(portfolio_id())
     )
   })
+  
   
   output$holdings_cards <- renderUI({
     data <- holdings()
