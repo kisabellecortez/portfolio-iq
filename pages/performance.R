@@ -2,9 +2,9 @@ portfolio_performance_page_ui <- function() {
   tagList(
     h2("Performance Overview"),
     
-    uiOutput("benchmark_selector"),
-    
     uiOutput("performance_metrics_boxes"),
+    
+    uiOutput("benchmark_selector"),
     
     radioButtons(
       "performance_period",
@@ -299,12 +299,12 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
     )
     
     card(
-      h2("Risk Analysis"),
+      h4("Risk Analysis"),
       
       layout_columns(
         div(
-          h5("Maximum Drawdown"),
-          h3(
+          h6("Maximum Drawdown"),
+          h5(
             if (is.na(max_drawdown)) {
               "N/A"
             } else {
@@ -314,8 +314,8 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
         ),
         
         div(
-          h5("Beta"),
-          h3(
+          h6("Beta"),
+          h5(
             if (is.na(beta)) {
               "N/A"
             } else {
@@ -325,8 +325,8 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
         ),
         
         div(
-          h5("Downside Deviation"),
-          h3(
+          h6("Downside Deviation"),
+          h5(
             if (is.na(downside_deviation)) {
               "N/A"
             } else {
@@ -336,8 +336,8 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
         ),
         
         div(
-          h5("Value at Risk (95%)"),
-          h3(
+          h6("Value at Risk (95%)"),
+          h5(
             if (is.na(var)) {
               "N/A"
             } else {

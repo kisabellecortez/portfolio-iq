@@ -7,9 +7,11 @@ source("data/dropdowns_data.R")
 source("data/performance_data.R")
 source("data/portfolio_overview_data.R")
 source("data/portfolio_performance_data.R")
+source("data/portfolio_projected_performance_data.R")
 
 source("pages/overview.R")
 source("pages/performance.R")
+source("pages/projected_performance.R")
 
 ui <- page_sidebar(
   title = "PortfolioIQ",
@@ -28,10 +30,13 @@ ui <- page_sidebar(
         title = "Portfolio Overview",
         value = "overview"
       ),
-      
       nav_panel(
         title = "Portfolio Performance",
         value = "performance"
+      ),
+      nav_panel(
+        title = "Projected Performance",
+        value = "projected_performance"
       )
     )
   ),
@@ -65,12 +70,11 @@ server <- function(input, output, session) {
     req(input$portfolio_pages)
     
     if (input$portfolio_pages == "overview") {
-      
       portfolio_overview_ui()
-      
     } else if (input$portfolio_pages == "performance") {
-      
       portfolio_performance_page_ui()
+    } else if (input$portfolio_pages == "projected_performance") {
+      portfolio_projected_performance_page_ui()
     }
   })
   
@@ -88,6 +92,12 @@ server <- function(input, output, session) {
     selected_portfolio_id
   )
   
+  portfolio_projected_performance_server(
+    input, 
+    output, 
+    session,
+    selected_portfolio_id
+  )
 }
 
 shinyApp(ui, server)
