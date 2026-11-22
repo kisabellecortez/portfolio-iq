@@ -2,23 +2,24 @@ library(DBI)
 library(RPostgres)
 library(dotenv)
 
-dotenv::load_dot_env
+dotenv::load_dot_env()
 
 connect_db <- function() {
+  
+  db_host <- Sys.getenv("PGHOST", "localhost")
+  db_port <- as.integer(Sys.getenv("PGPORT", "5434"))
+  db_name <- Sys.getenv("PGDATABASE", "portfolioiq")
+  db_user <- Sys.getenv("PGUSER", "portfolioiq_admin")
+  db_password <- Sys.getenv("PGPASSWORD", "")
+  
   con <- dbConnect(
     RPostgres::Postgres(),
-    dbname = Sys.getenv("DB_NAME"),
-    host = Sys.getenv("DB_HOST"),
-    port = Sys.getenv("DB_PORT"),
-    user = Sys.getenv("DB_USER"),
-    password = Sys.getenv("DB_PASSWORD")
+    host = db_host,
+    port = db_port,
+    dbname = db_name,
+    user = db_user,
+    password = db_password
   )
   
   return(con)
-}
-
-disconnect_db <- function(con) {
-  if(!is.null(con) && DBI::dbIsValid(con)) {
-    DBI::dbDisconnect(con)
-  }
 }
