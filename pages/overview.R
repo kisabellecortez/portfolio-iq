@@ -23,7 +23,9 @@ portfolio_overview_ui <- function() {
     
     plotlyOutput("overview_performance_chart", height = "550px"),
     
-    portfolio_allocation_ui(),
+    uioutput("sector_pie"),
+    
+    uiOutput("security_type_pie"),
     
     h2("Holdings"),
     

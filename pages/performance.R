@@ -300,55 +300,57 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
       current_portfolio_value
     )
     
-    card(
-      h4("Risk Analysis"),
-      
-      layout_columns(
-        div(
-          h6("Maximum Drawdown"),
-          h5(
-            if (is.na(max_drawdown)) {
-              "N/A"
-            } else {
-              scales::percent(max_drawdown, accuracy = 0.01)
-            }
-          )
-        ),
+    tagList(
+      card(
+        h4("Risk Analysis"),
         
-        div(
-          h6("Beta"),
-          h5(
-            if (is.na(beta)) {
-              "N/A"
-            } else {
-              round(beta, 2)
-            }
-          )
-        ),
-        
-        div(
-          h6("Downside Deviation"),
-          h5(
-            if (is.na(downside_deviation)) {
-              "N/A"
-            } else {
-              scales::percent(downside_deviation, accuracy = 0.01)
-            }
-          )
-        ),
-        
-        div(
-          h6("Value at Risk (95%)"),
-          h5(
-            if (is.na(var)) {
-              "N/A"
-            } else {
-              scales::dollar(var, accuracy = 0.01)
-            }
-          )
-        ),
-        
-        col_widths = c(3, 3, 3, 3)
+        layout_columns(
+          div(
+            h6("Maximum Drawdown"),
+            h5(
+              if (is.na(max_drawdown)) {
+                "N/A"
+              } else {
+                scales::percent(max_drawdown, accuracy = 0.01)
+              }
+            )
+          ),
+          
+          div(
+            h6("Beta"),
+            h5(
+              if (is.na(beta)) {
+                "N/A"
+              } else {
+                round(beta, 2)
+              }
+            )
+          ),
+          
+          div(
+            h6("Downside Deviation"),
+            h5(
+              if (is.na(downside_deviation)) {
+                "N/A"
+              } else {
+                scales::percent(downside_deviation, accuracy = 0.01)
+              }
+            )
+          ),
+          
+          div(
+            h6("Value at Risk (95%)"),
+            h5(
+              if (is.na(var)) {
+                "N/A"
+              } else {
+                scales::dollar(var, accuracy = 0.01)
+              }
+            )
+          ),
+          
+          col_widths = c(3, 3, 3, 3)
+        )
       )
     )
   })
