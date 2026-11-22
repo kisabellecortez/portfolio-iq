@@ -158,6 +158,7 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
     ) %>%
       layout(
         autosize = TRUE,
+        height = 550,
         xaxis = list(
           title = "",
           showgrid = FALSE
@@ -169,6 +170,9 @@ portfolio_overview_server <- function(input, output, session, portfolio_id) {
         ),
         margin = list(t = 40, b = 50, l = 60, r = 30),
         showlegend = FALSE
+      ) %>%
+      config(
+        responsive = TRUE
       )
   })
   

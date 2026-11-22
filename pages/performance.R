@@ -25,7 +25,12 @@ portfolio_performance_page_ui <- function() {
     
     plotlyOutput("performance_chart", height = "550px"),
     
-    uiOutput("risk_analysis")
+    h4("Risk Analysis"),
+    
+    div(
+      style = "margin-bottom: 20px;",
+      uiOutput("risk_analysis")
+    )
   )
 }
 
@@ -203,7 +208,6 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
     benchmark <- data$benchmark
     
     plot_ly() %>%
-      
       add_lines(
         data = portfolio,
         x = ~date,
@@ -216,7 +220,6 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
           "<extra></extra>"
         )
       ) %>%
-      
       add_lines(
         data = benchmark,
         x = ~date,
@@ -229,20 +232,19 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
           "<extra></extra>"
         )
       ) %>%
-      
       layout(
-        autosize = TRUE,
+        autosize = FALSE,
         height = 550,
         xaxis = list(
           title = "",
           showgrid = FALSE
         ),
         yaxis = list(
-          title = "Growth of $100",
+          title = "",
           showgrid = TRUE,
           separatethousands = TRUE
         ),
-        margin = list(t = 40, b = 50, l = 60, r = 30),
+        margin = list(t = 20, b = 40, l = 60, r = 20),
         legend = list(
           orientation = "h",
           x = 0,
@@ -252,9 +254,100 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
   })
   
   output$risk_analysis <- renderUI({
-    card(
-      h4("Risk Analysis"),
-      p("Risk analysis UI is working.")
+    req(portfolio_id())
+    req(selected_benchmark_id())
+    
+    portfolio_returns <- get_portfolio_returns(
+      portfolio_id()
+    )
+    
+    benchmark_returns <- get_benchmark_returns(
+      selected_benchmark_id()
+    )
+    
+    aligned_returns <- inner_join(
+      portfolio_returns,
+      benchmark_returns,
+      by = "date",
+      suffix = c("_portfolio", "_benchmark")
+    )
+    
+    portfolio_values <- get_portfolio_performance(
+      portfolio_id()
+    )
+    
+    portfolio_values <- portfolio_values %>%
+      arrange(date)
+    
+    max_drawdown <- calculate_max_drawdown(
+      portfolio_values$portfolio_value
+    )
+    
+    beta <- calculate_beta(
+      aligned_returns$daily_return_portfolio,
+      aligned_returns$daily_return_benchmark
+    )
+    
+    downside_deviation <- calculate_downside_deviation(
+      portfolio_returns$daily_return
+    )
+    
+    current_portfolio_value <- tail(
+      portfolio_values$portfolio_value,
+      1
+    )
+    
+    var <- calculate_var(
+      portfolio_returns$daily_return,
+      current_portfolio_value
+    )
+    
+    layout_columns(
+      div(
+        h6("Maximum Drawdown"),
+        h5(
+          if (is.na(max_drawdown)) {
+            "N/A"
+          } else {
+            scales::percent(max_drawdown, accuracy = 0.01)
+          }
+        )
+      ),
+      
+      div(
+        h6("Beta"),
+        h5(
+          if (is.na(beta)) {
+            "N/A"
+          } else {
+            round(beta, 2)
+          }
+        )
+      ),
+      
+      div(
+        h6("Downside Deviation"),
+        h5(
+          if (is.na(downside_deviation)) {
+            "N/A"
+          } else {
+            scales::percent(downside_deviation, accuracy = 0.01)
+          }
+        )
+      ),
+      
+      div(
+        h6("Value at Risk (95%)"),
+        h5(
+          if (is.na(var)) {
+            "N/A"
+          } else {
+            scales::dollar(var, accuracy = 0.01)
+          }
+        )
+      ),
+      
+      col_widths = c(3, 3, 3, 3)
     )
   })
 }
