@@ -233,7 +233,7 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
         )
       ) %>%
       layout(
-        autosize = FALSE,
+        autosize = TRUE,
         height = 550,
         xaxis = list(
           title = "",
@@ -244,12 +244,15 @@ portfolio_performance_server <- function(input, output, session, portfolio_id) {
           showgrid = TRUE,
           separatethousands = TRUE
         ),
-        margin = list(t = 20, b = 40, l = 60, r = 20),
+        margin = list(t = 40, b = 50, l = 60, r = 30),
         legend = list(
           orientation = "h",
           x = 0,
           y = 1.1
         )
+      ) %>%
+      config(
+        responsive = TRUE
       )
   })
   
